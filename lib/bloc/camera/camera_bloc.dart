@@ -24,11 +24,11 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
   ) async {
     print("Initializing camera");
     emit(CameraLoadingState());
-    print("Camera initialized");
     try {
       _controller = CameraController(event.camera, ResolutionPreset.medium);
       await _controller!.initialize();
       emit(CameraReadyState(_controller!));
+      print("Camera initialized");
     } catch (e) {
       emit(CameraErrorState('Failed to initialize camera: $e'));
     }

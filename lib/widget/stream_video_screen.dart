@@ -7,6 +7,7 @@ import 'package:flutter_camera_test_run/bloc/camera/camera_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/camera/camera_event.dart';
 import 'package:flutter_camera_test_run/bloc/camera/camera_state.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_bloc.dart';
+import 'package:flutter_camera_test_run/bloc/detector/detector_event.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_state.dart';
 
 class StreamVideoScreen extends StatelessWidget {
@@ -15,52 +16,68 @@ class StreamVideoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.read<CameraBloc>().add(InitializeCameraEvent(camera));
+    context.read<DetectorBloc>().add(InitializeModelEvent());
+
     return Scaffold(
-        appBar: AppBar(title: const Text('Stream Video')),
-        body: BlocBuilder<CameraBloc, CameraState>(
-          builder: (context, state) {
-            if (state is CameraLoadingState) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is CameraReadyState) {
-              return Column(
-                children: [
-                  Expanded(child: CameraPreview(state.controller)),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<CameraBloc>().add(StartImageStreamEvent(context));
-                    },
-                    child: const Text('Start Image Stream'),
-                  ),
-                  BlocListener<DetectorBloc, DetectorState>(
-                    listener: (context, state) {
-                      if (state is DetectorResultState) {
-                        print("Model output: ${state.output}");
-                      }
-                    },
-                    child: Container(),
-                  )
-                ],
-              );
-            } else if (state is CameraStreamingState) {
-              return BlocBuilder<DetectorBloc, DetectorState>(
-              builder: (context, state) {
-                if (state is DetectorResultState) {
-                  return Center(child: Text("Model output: ${state.output}"));
-                } else if (state is DetectorErrorState) {
-                  return Center(child: Text(state.message));
-                } else {
-                  return const Center(child: Text('Streaming...'));
-                }
-              },
+      appBar: AppBar(title: const Text('Stream Video')),
+      body: BlocBuilder<CameraBloc, CameraState>(
+        builder: (context, state) {
+          if (state is CameraLoadingState) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is CameraReadyState) {
+            return Column(
+              children: [
+                Expanded(child: CameraPreview(state.controller)),
+                ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<CameraBloc>()
+                        .add(StartImageStreamEvent(context));
+                  },
+                  child: const Text('Start Image Stream'),
+                ),
+                BlocListener<DetectorBloc, DetectorState>(
+                  listener: (context, state) {
+                    if (state is DetectorResultState) {
+                      print("Model output: ${state.output}");
+                    }
+                  },
+                  child: Container(),
+                )
+              ],
             );
-            } else if (state is CameraErrorState) {
-              return Center(child: Text(state.message));
-            } else { // Camera is not initialized
-              return const Center(child: Text('Initializing...'));
-            }
-          },
-        ),
-        /* floatingActionButton: FloatingActionButton(
+          } else if (state is CameraStreamingState) {
+            return Column(
+              children: [
+                Expanded(child: CameraPreview(state.controller)),
+                BlocBuilder<DetectorBloc, DetectorState>(
+                  builder: (context, state) {
+                    Widget detectorWidget = Container();
+                    if (state is DetectorResultState) {
+                      detectorWidget =
+                          Center(child: Text("Model output: ${state.output}"));
+                    } else if (state is DetectorErrorState) {
+                      detectorWidget = Center(child: Text(state.message));
+                    } else {
+                      detectorWidget =
+                          const Center(child: Text('Streaming...'));
+                    }
+
+                    return detectorWidget;
+                  },
+                )
+              ],
+            );
+          } else if (state is CameraErrorState) {
+            return Center(child: Text(state.message));
+          } else {
+            // Camera is not initialized
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+      /* floatingActionButton: FloatingActionButton(
           onPressed: () {
             context.read<CameraBloc>().add(TakePicture());
           },

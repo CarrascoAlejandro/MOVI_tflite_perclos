@@ -6,7 +6,7 @@ abstract class DetectorEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadModelEvent extends DetectorEvent {}
+class InitializeModelEvent extends DetectorEvent {}
 
 class RunModelEvent extends DetectorEvent {
   final CameraImage image;

@@ -1,18 +1,20 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_event.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_state.dart';
+import 'package:flutter_camera_test_run/util/image_utils.dart';
+import 'package:image/image.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 
 class DetectorBloc extends Bloc<DetectorEvent, DetectorState>{
   Interpreter? _interpreter;
 
   DetectorBloc() : super(DetectorInitialState()) {
-    on<LoadModelEvent>(_onLoadModel);
+    on<InitializeModelEvent>(_onInitializeModel);
     on<RunModelEvent>(_onRunModel);
   }
 
-  Future<void> _onLoadModel(LoadModelEvent event, Emitter<DetectorState> emit) async {
-    print("Loading model");
+  Future<void> _onInitializeModel(InitializeModelEvent event, Emitter<DetectorState> emit) async {
+    print("Initializing detector");
     emit(DetectorLoadingState());
     try {
       _interpreter = await Interpreter.fromAsset('assets/facial_landmark_MobileNet.tflite');
@@ -28,16 +30,28 @@ class DetectorBloc extends Bloc<DetectorEvent, DetectorState>{
       emit(DetectorErrorState("Model not loaded"));
       return;
     }
-    print("Running model");
+    //print("Running model");
 
     try {
       var input = event.image;
-      var output;
+      var output = List.filled(1, List.filled(1, 0.0));
       
-      _interpreter!.run(input, output);
+      //convert the input to an appropriate format
+      //print("Converting image");
+      Image? convertedInput = convertCameraImage(input);
+      if(convertedInput == null){
+        emit(DetectorErrorState("Failed to convert image"));
+        return;
+      }
+      // Convert the Image to a float32 tensor
+      var inputTensor = imageToFloat32Tensor(convertedInput);
+
+      //run the model
+      _interpreter!.run(inputTensor, output);
       print("Emitting result");
       emit(DetectorResultState(output));
     } catch (e) {
+      print("Error running model: $e");
       emit(DetectorErrorState('Failed to run model: $e'));
     }
   }
