@@ -12,10 +12,12 @@ class DetectorBloc extends Bloc<DetectorEvent, DetectorState>{
   }
 
   Future<void> _onLoadModel(LoadModelEvent event, Emitter<DetectorState> emit) async {
+    print("Loading model");
     emit(DetectorLoadingState());
     try {
       _interpreter = await Interpreter.fromAsset('assets/facial_landmark_MobileNet.tflite');
       emit(DetectorModelLoadedState());
+      print("Model loaded");
     } catch (e) {
       emit(DetectorErrorState("Failed to load model"));
     }
@@ -26,13 +28,14 @@ class DetectorBloc extends Bloc<DetectorEvent, DetectorState>{
       emit(DetectorErrorState("Model not loaded"));
       return;
     }
+    print("Running model");
 
     try {
       var input = event.image;
       var output;
       
       _interpreter!.run(input, output);
-
+      print("Emitting result");
       emit(DetectorResultState(output));
     } catch (e) {
       emit(DetectorErrorState('Failed to run model: $e'));

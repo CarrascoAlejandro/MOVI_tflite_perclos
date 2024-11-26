@@ -1,7 +1,9 @@
 import 'dart:async';
 
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter_camera_test_run/bloc/detector/detector_event.dart';
+import 'package:flutter_camera_test_run/bloc/detector/detector_bloc.dart';
 
 import 'camera_event.dart';
 import 'camera_state.dart';
@@ -17,8 +19,12 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
   }
 
   Future<void> _onInitializeCamera(
-      InitializeCameraEvent event, Emitter<CameraState> emit) async {
+      InitializeCameraEvent event, 
+      Emitter<CameraState> emit
+  ) async {
+    print("Initializing camera");
     emit(CameraLoadingState());
+    print("Camera initialized");
     try {
       _controller = CameraController(event.camera, ResolutionPreset.medium);
       await _controller!.initialize();
@@ -51,11 +57,14 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
       emit(CameraErrorState('Camera not initialized'));
       return;
     }
+    print("Starting image stream");
 
     try {
       await _controller!.startImageStream((CameraImage image){
         // This function is called every time a new frame is available
         print("Image stream received: ${image.planes.length}");
+
+        BlocProvider.of<DetectorBloc>(event.context).add(RunModelEvent(image));
       });
       emit(CameraStreamingState(_controller!));
     } catch (e) {

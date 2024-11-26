@@ -1,5 +1,4 @@
-import 'dart:ui';
-
+import 'package:camera/camera.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class DetectorEvent extends Equatable {
@@ -10,7 +9,7 @@ abstract class DetectorEvent extends Equatable {
 class LoadModelEvent extends DetectorEvent {}
 
 class RunModelEvent extends DetectorEvent {
-  final Image image;
+  final CameraImage image;
 
   RunModelEvent(this.image);
 

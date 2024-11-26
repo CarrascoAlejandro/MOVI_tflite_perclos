@@ -6,6 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/camera/camera_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/camera/camera_event.dart';
 import 'package:flutter_camera_test_run/bloc/camera/camera_state.dart';
+import 'package:flutter_camera_test_run/bloc/detector/detector_bloc.dart';
+import 'package:flutter_camera_test_run/bloc/detector/detector_state.dart';
 
 class StreamVideoScreen extends StatelessWidget {
   final CameraDescription camera;
@@ -13,9 +15,7 @@ class StreamVideoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => CameraBloc()..add(InitializeCameraEvent(camera)),
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(title: const Text('Stream Video')),
         body: BlocBuilder<CameraBloc, CameraState>(
           builder: (context, state) {
@@ -27,14 +27,32 @@ class StreamVideoScreen extends StatelessWidget {
                   Expanded(child: CameraPreview(state.controller)),
                   ElevatedButton(
                     onPressed: () {
-                      context.read<CameraBloc>().add(StartImageStreamEvent());
+                      context.read<CameraBloc>().add(StartImageStreamEvent(context));
                     },
                     child: const Text('Start Image Stream'),
                   ),
+                  BlocListener<DetectorBloc, DetectorState>(
+                    listener: (context, state) {
+                      if (state is DetectorResultState) {
+                        print("Model output: ${state.output}");
+                      }
+                    },
+                    child: Container(),
+                  )
                 ],
               );
             } else if (state is CameraStreamingState) {
-              return CameraPreview(state.controller);
+              return BlocBuilder<DetectorBloc, DetectorState>(
+              builder: (context, state) {
+                if (state is DetectorResultState) {
+                  return Center(child: Text("Model output: ${state.output}"));
+                } else if (state is DetectorErrorState) {
+                  return Center(child: Text(state.message));
+                } else {
+                  return const Center(child: Text('Streaming...'));
+                }
+              },
+            );
             } else if (state is CameraErrorState) {
               return Center(child: Text(state.message));
             } else { // Camera is not initialized
@@ -48,7 +66,6 @@ class StreamVideoScreen extends StatelessWidget {
           },
           child: const Icon(Icons.camera_alt),
         ), */
-      ),
     );
   }
 }
