@@ -57,6 +57,24 @@ class DetectorBloc extends Bloc<DetectorEvent, DetectorState> {
     }
   }
 
+  Future<void> _onPickImageEvent(
+      PickImageDetectEvent event, Emitter<DetectorState> emit) async {
+    try{
+      _inputImage = InputImage.fromFile(event.image);
+
+      // Run the model
+      List<Face> faces = await _faceDetector!.processImage(_inputImage!);
+
+      print("ALECAR: Found ${faces.length} faces");
+
+      // Emit the results
+      emit(DetectorResultState(faces.first));
+    } catch (e) {
+      print("ALECAR: Error running model: $e");
+      emit(DetectorErrorState("Error running model: $e"));
+    }
+  }
+
   @override
   Future<void> close() {
     return super.close();

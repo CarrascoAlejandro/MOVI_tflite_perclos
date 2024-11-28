@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/camera/camera_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_bloc.dart';
+import 'package:flutter_camera_test_run/bloc/image/image_bloc.dart';
+import 'package:flutter_camera_test_run/widget/pick_image_screen.dart';
 import 'package:flutter_camera_test_run/widget/stream_video_screen.dart';
 
 Future<void> main() async {
@@ -21,14 +23,16 @@ Future<void> main() async {
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider(create: (context) => CameraBloc()),
-      BlocProvider(create: (context) => DetectorBloc())
+      BlocProvider(create: (context) => DetectorBloc()),
+      BlocProvider(create: (context) => ImageBloc()),
     ],
     child: MaterialApp(
       theme: ThemeData.dark(),
-      home: StreamVideoScreen(
+      //home: StreamVideoScreen(
         // Pass the appropriate camera to the TakePictureScreen widget.
-        camera: firstCamera,
-      ),
+        //camera: firstCamera,
+      //),
+      home: PickImageScreen(),  
     ),
   ));
 }

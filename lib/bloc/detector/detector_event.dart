@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:equatable/equatable.dart';
 
@@ -12,6 +14,15 @@ class RunModelEvent extends DetectorEvent {
   final CameraImage image;
 
   RunModelEvent(this.image);
+
+  @override
+  List<Object?> get props => [image];
+}
+
+class PickImageDetectEvent extends DetectorEvent {
+  final File image;
+
+  PickImageDetectEvent(this.image);
 
   @override
   List<Object?> get props => [image];
