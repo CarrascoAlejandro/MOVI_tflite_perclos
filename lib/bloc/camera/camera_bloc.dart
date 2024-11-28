@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_event.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_bloc.dart';
 
 import 'camera_event.dart';
@@ -21,17 +20,17 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
   }
 
   Future<void> _onInitializeCamera(
-      InitializeCameraEvent event, 
-      Emitter<CameraState> emit
-  ) async {
+      InitializeCameraEvent event, Emitter<CameraState> emit) async {
     print("ALECAR: Initializing camera");
     emit(CameraLoadingState());
     try {
       _controller = CameraController(
-        event.camera, 
+        event.camera,
         ResolutionPreset.medium,
-        imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.nv21 : ImageFormatGroup.bgra8888,
-        );
+        imageFormatGroup: Platform.isAndroid
+            ? ImageFormatGroup.nv21
+            : ImageFormatGroup.bgra8888,
+      );
       await _controller!.initialize();
       emit(CameraReadyState(_controller!));
       print("ALECAR: Camera initialized");
@@ -57,8 +56,7 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
   }
 
   Future<void> _onStartImageStreamEvent(
-    StartImageStreamEvent event, Emitter<CameraState> emit
-  ) async {
+      StartImageStreamEvent event, Emitter<CameraState> emit) async {
     if (_controller == null || !_controller!.value.isInitialized) {
       emit(CameraErrorState('Camera not initialized'));
       return;
@@ -69,17 +67,9 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     try {
       await _controller!.startImageStream((CameraImage image) async {
         // This function is called every time a new frame is available
-        if (image.planes.length != 1){
+        if (image.planes.length != 3) {
           print("ALECAR: Image stream has ${image.planes.length} planes");
           emit(CameraErrorState('Image stream has ${image.planes.length} planes'));
-
-          // Save each plane to a file for inspection
-          for (int i = 0; i < image.planes.length; i++){
-            final directory = await getApplicationDocumentsDirectory();
-            final File file = File('${directory.path}/plane$i.jpg');
-            file.writeAsBytesSync(image.planes[i].bytes);
-          }
-
           return;
         }
         BlocProvider.of<DetectorBloc>(event.context).add(RunModelEvent(image));
