@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 
 abstract class DetectorState extends Equatable {
   @override
@@ -12,7 +13,7 @@ class DetectorLoadingState extends DetectorState {}
 class DetectorModelLoadedState extends DetectorState {}
 
 class DetectorResultState extends DetectorState {
-  final List<List<double>> output;
+  final Face output;
 
   DetectorResultState(this.output);
 

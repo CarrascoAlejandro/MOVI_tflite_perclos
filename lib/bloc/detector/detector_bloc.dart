@@ -1,65 +1,64 @@
+import 'dart:ui';
+
 import 'package:bloc/bloc.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_event.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_state.dart';
-import 'package:flutter_camera_test_run/util/image_utils.dart';
-import 'package:image/image.dart';
-import 'package:tflite_flutter/tflite_flutter.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 
-class DetectorBloc extends Bloc<DetectorEvent, DetectorState>{
-  Interpreter? _interpreter;
+
+class DetectorBloc extends Bloc<DetectorEvent, DetectorState> {
+  InputImage? _inputImage;
+  FaceDetector? _faceDetector;
 
   DetectorBloc() : super(DetectorInitialState()) {
     on<InitializeModelEvent>(_onInitializeModel);
     on<RunModelEvent>(_onRunModel);
   }
 
-  Future<void> _onInitializeModel(InitializeModelEvent event, Emitter<DetectorState> emit) async {
-    print("Initializing detector");
-    emit(DetectorLoadingState());
-    try {
-      _interpreter = await Interpreter.fromAsset('assets/facial_landmark_MobileNet.tflite');
-      emit(DetectorModelLoadedState());
-      print("Model loaded");
-    } catch (e) {
-      emit(DetectorErrorState("Failed to load model"));
-    }
+  Future<void> _onInitializeModel(
+      InitializeModelEvent event, Emitter<DetectorState> emit) async {
+    print("ALECAR: Initializing detector");
+
+    FaceDetectorOptions options = FaceDetectorOptions(
+      enableContours: true,
+      enableLandmarks: true,
+    );
+
+    _faceDetector = GoogleMlKit.vision.faceDetector(options);
   }
 
-  Future<void> _onRunModel(RunModelEvent event, Emitter<DetectorState> emit) async {
-    if(_interpreter == null){
-      emit(DetectorErrorState("Model not loaded"));
-      return;
-    }
-    //print("Running model");
-
+  Future<void> _onRunModel(
+      RunModelEvent event, Emitter<DetectorState> emit) async {
     try {
-      var input = event.image;
-      var output = List.filled(1, List.filled(1, 0.0));
-      
-      //convert the input to an appropriate format
-      //print("Converting image");
-      Image? convertedInput = convertCameraImage(input);
-      if(convertedInput == null){
-        emit(DetectorErrorState("Failed to convert image"));
-        return;
-      }
-      // Convert the Image to a float32 tensor
-      var inputTensor = imageToFloat32Tensor(convertedInput);
+      CameraImage cameraImage = event.image;
 
-      //run the model
-      _interpreter!.run(inputTensor, output);
-      print("Emitting result");
-      emit(DetectorResultState(output));
+      // Convert the camera image to a format that the interpreter can understand
+      _inputImage = InputImage.fromBytes(
+        bytes: cameraImage.planes[0].bytes,
+        metadata: InputImageMetadata(
+          size: Size(cameraImage.width.toDouble(), cameraImage.height.toDouble()),
+          rotation: InputImageRotation.rotation0deg,
+          format: InputImageFormat.nv21,
+          bytesPerRow: cameraImage.planes[0].bytesPerRow,
+          )
+      );
+
+      // Run the model
+      List<Face> faces = await _faceDetector!.processImage(_inputImage!);
+
+      print("ALECAR: Found ${faces.length} faces");
+
+      // Emit the results
+      emit(DetectorResultState(faces.first));
     } catch (e) {
-      print("Error running model: $e");
-      emit(DetectorErrorState('Failed to run model: $e'));
+      print("ALECAR: Error running model: $e");
+      emit(DetectorErrorState("Error running model: $e"));
     }
   }
 
   @override
   Future<void> close() {
-    _interpreter?.close();
     return super.close();
   }
-
 }
