@@ -13,17 +13,29 @@ class ImageBloc extends Bloc<ImageEvent, ImageState> {
 
   ImageBloc() : super(ImageInitialState()){
     on<PickImageEvent>(_onPickImage);
+    on<ImageProcessedEvent>(_onImageProcessed);
+    on<ImageErrorEvent>(_onImageError);
   }
 
   Future<void> _onPickImage(PickImageEvent event, Emitter<ImageState> emit) async {
+    print("ALECAR: _onPickImage awaiting image");
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       final image = File(pickedFile.path);
+      print("ALECAR: _onPickImage image picked ${pickedFile.path}");
+      BlocProvider.of<DetectorBloc>(event.context).add(PickImageDetectEvent(event.context, image));
       emit(ImagePickedState(image));
-      
-      BlocProvider.of<DetectorBloc>(event.context).add(PickImageDetectEvent(image));
-
-      emit(ImageProcessedState(image));
+    } else {
+      print("ALECAR: _onPickImage no image picked");
+      emit(ImageErrorState("No image picked"));
     }
+  }
+
+  Future<void> _onImageProcessed(ImageProcessedEvent event, Emitter<ImageState> emit) async {
+    emit(ImageProcessedState(event.image));
+  }
+
+  Future<void> _onImageError(ImageErrorEvent event, Emitter<ImageState> emit) async {
+    emit(ImageErrorState(event.error));
   }
 }

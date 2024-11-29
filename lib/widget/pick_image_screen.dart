@@ -25,6 +25,8 @@ class PickImageScreen extends StatelessWidget {
               return buildInitialInput(context);
             } else if (state is ImagePickedState) {
               return buildImageDisplay(context, state.image);
+            } else if (state is ImageErrorState) {
+              return Text(state.error);
             } else if (state is ImageProcessedState) {
               return buildImageResult(context, state.image);
             } else {
@@ -71,7 +73,7 @@ class PickImageScreen extends StatelessWidget {
           builder: (context, state) {
             Widget detectorWidget = Container();
             if (state is DetectorResultState) {
-              detectorWidget = Text("Model output: ${state.output}");
+              detectorWidget = Text("Model output: ${state.output.leftEyeOpenProbability} ${state.output.rightEyeOpenProbability}");
             } else if (state is DetectorErrorState) {
               detectorWidget = Text(state.message);
             } else {
