@@ -43,48 +43,85 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Camera App'),
+    return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/Black-texture-iphone.jpg'),
+          fit: BoxFit.cover,
+        ),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Colors.white,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Camera App'),
+        ),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                ),
+                child: Column(children: [
+                  Image.asset(
+                    'assets/ai_eye.png',
+                    width: 100,
+                  ),
+                  const Text(
+                    'Drowsiness Detection',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Serif',
+                    ),
+                  ),
+                ]),
               ),
-              child: Column(children: [
-                Image.asset(
-                  'assets/ai_eye.png',
-                  width: 100,
-                ),
-                const Text(
-                  'Drowsiness Detection',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Serif',
-                  ),
-                ),
-              ]),
-            ),
-            ListTile(
-              title: const Text('Stream Video'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => StreamVideoScreen(camera: camera),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('Pick Image'),
-              onTap: () {
+              ListTile(
+                title: const Text('Stream Video'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StreamVideoScreen(camera: camera),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('Pick Image'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PickImageScreen(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('Take Picture'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CameraShotScreen(camera: camera),
+                    ),
+                  );
+                },
+              )
+            ],
+          ),
+        ),
+        body: Center(
+            child: SingleChildScrollView(
+                child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const AboutPERCLOS(),
+            ElevatedButton(
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -92,40 +129,12 @@ class MyHomePage extends StatelessWidget {
                   ),
                 );
               },
+              child: const Text('Try it Out!'),
             ),
-            ListTile(
-              title: const Text('Take Picture'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CameraShotScreen(camera: camera),
-                  ),
-                );
-              },
-            )
+            SizedBox(height: 20),
           ],
-        ),
+        ))),
       ),
-      body: Center(
-          child: SingleChildScrollView(
-              child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const AboutPERCLOS(),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PickImageScreen(),
-                ),
-              );
-            },
-            child: const Text('Try it Out!'),
-          ),
-        ],
-      ))),
     );
   }
 }

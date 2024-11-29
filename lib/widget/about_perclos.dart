@@ -21,8 +21,8 @@ class AboutPERCLOS extends StatelessWidget {
           const Text(
             'PERCLOS stands for "Percentage of Eye Closure." It\'s a metric that measures the proportion of time a driver\'s eyes are closed beyond a certain threshold (usually 80%) during a specific time period. This metric is primarily used to assess driver drowsiness and fatigue levels.',
           ),
-          Image.asset('assets/hero_advanced_drowsiness.jpg'),
           const SizedBox(height: 8),
+          Image.asset('assets/hero_advanced_drowsiness.jpg'),
           const SizedBox(height: 16),
           const Text(
             'How is PERCLOS Used in Driver Drowsiness Detection?',
