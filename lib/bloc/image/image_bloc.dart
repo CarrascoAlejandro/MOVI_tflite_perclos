@@ -15,6 +15,7 @@ class ImageBloc extends Bloc<ImageEvent, ImageState> {
     on<PickImageEvent>(_onPickImage);
     on<ImageProcessedEvent>(_onImageProcessed);
     on<ImageErrorEvent>(_onImageError);
+    on<ResetImageEvent>(_onResetImage);
   }
 
   Future<void> _onPickImage(PickImageEvent event, Emitter<ImageState> emit) async {
@@ -37,5 +38,9 @@ class ImageBloc extends Bloc<ImageEvent, ImageState> {
 
   Future<void> _onImageError(ImageErrorEvent event, Emitter<ImageState> emit) async {
     emit(ImageErrorState(event.error));
+  }
+
+  Future<void> _onResetImage(ResetImageEvent event, Emitter<ImageState> emit) async {
+    emit(ImageInitialState());
   }
 }

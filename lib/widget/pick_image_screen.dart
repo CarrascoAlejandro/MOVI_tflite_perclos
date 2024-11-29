@@ -8,6 +8,8 @@ import 'package:flutter_camera_test_run/bloc/detector/detector_state.dart';
 import 'package:flutter_camera_test_run/bloc/image/image_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/image/image_event.dart';
 import 'package:flutter_camera_test_run/bloc/image/image_state.dart';
+import 'package:flutter_camera_test_run/widget/how_it_works.dart';
+import 'package:flutter_camera_test_run/widget/results_component.dart';
 
 class PickImageScreen extends StatelessWidget {
   @override
@@ -35,6 +37,20 @@ class PickImageScreen extends StatelessWidget {
           },
         ),
       ),
+      floatingActionButton: BlocBuilder<ImageBloc, ImageState>(
+          builder: (context, state) {
+            if (state is! ImageInitialState) {
+              return FloatingActionButton(
+                onPressed: () {
+                  BlocProvider.of<ImageBloc>(context).add(ResetImageEvent());
+                },
+                child: Icon(Icons.refresh),
+              );
+            } else {
+              return Container();
+            }
+        },
+      ),
     );
   }
 
@@ -42,6 +58,9 @@ class PickImageScreen extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        Image.asset('assets/face_landmarks.png', height: 180),
+        HowItWorks(),
+        SizedBox(height: 20),
         ElevatedButton(
           onPressed: () {
             BlocProvider.of<ImageBloc>(context).add(PickImageEvent(context));
@@ -67,13 +86,23 @@ class PickImageScreen extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.file(image),
+        Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.6,
+          ),
+          child: Image.file(image),
+        ),
         SizedBox(height: 20),
         BlocBuilder<DetectorBloc, DetectorState>(
           builder: (context, state) {
             Widget detectorWidget = Container();
             if (state is DetectorResultState) {
-              detectorWidget = Text("Model output: ${state.output.leftEyeOpenProbability} ${state.output.rightEyeOpenProbability}");
+              detectorWidget = ResultsComponent(
+                value1: state.output.leftEyeOpenProbability,
+                value2: state.output.rightEyeOpenProbability,
+                value1label: 'Left Eye',
+                value2label: 'Right Eye',
+              );
             } else if (state is DetectorErrorState) {
               detectorWidget = Text(state.message);
             } else {

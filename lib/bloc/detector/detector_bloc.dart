@@ -56,7 +56,7 @@ class DetectorBloc extends Bloc<DetectorEvent, DetectorState> {
       print("ALECAR: Found ${faces.length} faces");
 
       // Emit the results
-      emit(DetectorResultState(faces.first));
+      if (!faces.isEmpty) emit(DetectorResultState(faces.first));
     } catch (e) {
       print("ALECAR: Error running model: $e");
       emit(DetectorErrorState("Error running model: $e"));
@@ -81,12 +81,10 @@ class DetectorBloc extends Bloc<DetectorEvent, DetectorState> {
       // Emit the results
       if (faces.isEmpty) {
         print("ALECAR: No faces found");
-        BlocProvider.of<ImageBloc>(event.context).add(ImageErrorEvent("No faces found"));
         emit(DetectorErrorState("No faces found"));
       } else {
         
         print("ALECAR: Found face: ${faces.first.leftEyeOpenProbability}");
-        BlocProvider.of<ImageBloc>(event.context).add(ImageProcessedEvent(event.context, event.image));
         emit(DetectorResultState(faces.first));
       }
     } catch (e) {

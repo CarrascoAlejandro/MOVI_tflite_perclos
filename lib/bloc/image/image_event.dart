@@ -37,3 +37,5 @@ class ImageErrorEvent extends ImageEvent {
   @override
   List<Object> get props => [error];
 }
+
+class ResetImageEvent extends ImageEvent {}

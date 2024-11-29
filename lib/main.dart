@@ -28,11 +28,60 @@ Future<void> main() async {
     ],
     child: MaterialApp(
       theme: ThemeData.dark(),
-      /* home: StreamVideoScreen(
-        // Pass the appropriate camera to the TakePictureScreen widget.
-        camera: firstCamera,
-      ), */
-      home: PickImageScreen(),  
+      home: MyHomePage(camera: firstCamera),
     ),
   ));
+}
+
+class MyHomePage extends StatelessWidget {
+  final CameraDescription camera;
+
+  MyHomePage({required this.camera});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Camera App'),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text('Menu'),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              title: Text('Stream Video'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => StreamVideoScreen(camera: camera),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Pick Image'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PickImageScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+      body: Center(
+        child: Text('Select an option from the drawer'),
+      ),
+    );
+  }
 }
