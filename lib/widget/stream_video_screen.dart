@@ -9,6 +9,7 @@ import 'package:flutter_camera_test_run/bloc/camera/camera_state.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_event.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_state.dart';
+import 'package:flutter_camera_test_run/widget/results_component.dart';
 
 class StreamVideoScreen extends StatelessWidget {
   final CameraDescription camera;
@@ -28,7 +29,13 @@ class StreamVideoScreen extends StatelessWidget {
           } else if (state is CameraReadyState) {
             return Column(
               children: [
-                Expanded(child: CameraPreview(state.controller)),
+                const SizedBox(height: 20),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: MediaQuery.of(context).size.height * 0.60,
+                    child: CameraPreview(state.controller),
+                  ),
+                  const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     context
@@ -50,18 +57,29 @@ class StreamVideoScreen extends StatelessWidget {
           } else if (state is CameraStreamingState) {
             return Column(
               children: [
-                Expanded(child: CameraPreview(state.controller)),
+                const SizedBox(height: 20),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: MediaQuery.of(context).size.height * 0.60,
+                    child: CameraPreview(state.controller),
+                  ),
+                  const SizedBox(height: 20),
                 BlocBuilder<DetectorBloc, DetectorState>(
                   builder: (context, state) {
                     Widget detectorWidget = Container();
                     if (state is DetectorResultState) {
                       detectorWidget =
-                          Center(child: Text("Model output: ${state.output}"));
+                          Center(child: ResultsComponent(
+                            value1: state.output.leftEyeOpenProbability, 
+                            value2: state.output.rightEyeOpenProbability,
+                            value1label: 'Left Eye',
+                            value2label: 'Right Eye',
+                          ));
                     } else if (state is DetectorErrorState) {
                       detectorWidget = Center(child: Text(state.message));
                     } else {
                       detectorWidget =
-                          const Center(child: Text('Streaming...'));
+                          const Center(child: Text('Streaming, Looking for faces...'));
                     }
 
                     return detectorWidget;
