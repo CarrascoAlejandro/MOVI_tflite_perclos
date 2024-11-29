@@ -21,11 +21,13 @@ class ImagePickedState extends ImageState {
 
 class ImageProcessedState extends ImageState {
   final File image;
+  final int width;
+  final int height;
 
-  const ImageProcessedState(this.image);
+  const ImageProcessedState(this.image, this.width, this.height);
 
   @override
-  List<Object> get props => [image];
+  List<Object> get props => [image, width, height];
 }
 
 class ImageErrorState extends ImageState {

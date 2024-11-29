@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_bloc.dart';
@@ -33,7 +34,13 @@ class ImageBloc extends Bloc<ImageEvent, ImageState> {
   }
 
   Future<void> _onImageProcessed(ImageProcessedEvent event, Emitter<ImageState> emit) async {
-    emit(ImageProcessedState(event.image));
+    final bytes = await event.image.readAsBytes();
+    final codec = await instantiateImageCodec(bytes);
+    final frame = await codec.getNextFrame();
+    final image = frame.image;
+    final width = image.width;
+    final height = image.height;
+    emit(ImageProcessedState(event.image, width, height));
   }
 
   Future<void> _onImageError(ImageErrorEvent event, Emitter<ImageState> emit) async {

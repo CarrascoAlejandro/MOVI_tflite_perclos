@@ -8,6 +8,7 @@ import 'package:flutter_camera_test_run/bloc/detector/detector_state.dart';
 import 'package:flutter_camera_test_run/bloc/image/image_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/image/image_event.dart';
 import 'package:flutter_camera_test_run/bloc/image/image_state.dart';
+import 'package:flutter_camera_test_run/painter/face_landmark_painter.dart';
 import 'package:flutter_camera_test_run/widget/how_it_works.dart';
 import 'package:flutter_camera_test_run/widget/results_component.dart';
 
@@ -30,7 +31,7 @@ class PickImageScreen extends StatelessWidget {
             } else if (state is ImageErrorState) {
               return Text(state.error);
             } else if (state is ImageProcessedState) {
-              return buildImageResult(context, state.image);
+              return buildImageResult(context, state.image, state.width, state.height);
             } else {
               return Container();
             }
@@ -82,15 +83,34 @@ class PickImageScreen extends StatelessWidget {
     );
   }
 
-  Widget buildImageResult(BuildContext context, File image) {
+  Widget buildImageResult(BuildContext context, File image, int width, int height) {
+    //final double width_relative = width / 100;
+    final Image imageWidget = Image.file(
+      image
+    );
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.6,
-          ),
-          child: Image.file(image),
+        BlocBuilder<DetectorBloc, DetectorState>(
+          builder: (context, state) {
+            if (state is DetectorResultState) {
+              print("ALECAR: PickImageScreen Painting landmarks");
+              return Stack(
+                children: [
+                  imageWidget,
+                  /* CustomPaint(
+                    size: Size(width.toDouble(), height.toDouble()),
+                    painter: FaceLandmarkPainter(
+                      landmarks: state.output.landmarks
+                    ),
+                  ), */
+                ],
+              );
+            } else {
+              return imageWidget;
+            }  
+          },
         ),
         SizedBox(height: 20),
         BlocBuilder<DetectorBloc, DetectorState>(
