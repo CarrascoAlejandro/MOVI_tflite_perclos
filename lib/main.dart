@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/camera/camera_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/image/image_bloc.dart';
+import 'package:flutter_camera_test_run/widget/about_perclos.dart';
 import 'package:flutter_camera_test_run/widget/pick_image_screen.dart';
 import 'package:flutter_camera_test_run/widget/stream_video_screen.dart';
 
@@ -42,20 +43,33 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Camera App'),
+        title: const Text('Camera App'),
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              child: Text('Menu'),
-              decoration: BoxDecoration(
-                color: Colors.blue,
+              child: Column(
+                children: [
+                  Image.asset('assets/ai_eye.png', width: 100,),
+                  const Text(
+                    'Drowsiness Detection',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Serif',
+                    ),
+                  ),
+                  ]
+                  ),
+              decoration: const BoxDecoration(
+                color: Colors.white,
               ),
             ),
             ListTile(
-              title: Text('Stream Video'),
+              title: const Text('Stream Video'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -66,7 +80,7 @@ class MyHomePage extends StatelessWidget {
               },
             ),
             ListTile(
-              title: Text('Pick Image'),
+              title: const Text('Pick Image'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -80,8 +94,25 @@ class MyHomePage extends StatelessWidget {
         ),
       ),
       body: Center(
-        child: Text('Select an option from the drawer'),
-      ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const AboutPERCLOS(),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PickImageScreen(),
+                    ),
+                  );
+                },
+                child: const Text('Try it Out!'),
+              ),
+              ],
+        )
+      )),
     );
   }
 }
