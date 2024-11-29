@@ -9,6 +9,7 @@ import 'package:flutter_camera_test_run/bloc/image/image_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/image/image_event.dart';
 import 'package:flutter_camera_test_run/bloc/image/image_state.dart';
 import 'package:flutter_camera_test_run/painter/face_landmark_painter.dart';
+import 'package:flutter_camera_test_run/widget/error_component.dart';
 import 'package:flutter_camera_test_run/widget/how_it_works.dart';
 import 'package:flutter_camera_test_run/widget/results_component.dart';
 
@@ -124,7 +125,7 @@ class PickImageScreen extends StatelessWidget {
                 value2label: 'Right Eye',
               );
             } else if (state is DetectorErrorState) {
-              detectorWidget = Text(state.message);
+              detectorWidget = Center(child: ErrorComponent(errorMessage: state.message));
             } else {
               detectorWidget = Text('Processing...');
             }

@@ -9,6 +9,7 @@ import 'package:flutter_camera_test_run/bloc/camera/camera_state.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_event.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_state.dart';
+import 'package:flutter_camera_test_run/widget/error_component.dart';
 import 'package:flutter_camera_test_run/widget/results_component.dart';
 
 class CameraShotScreen extends StatelessWidget {
@@ -59,7 +60,7 @@ class CameraShotScreen extends StatelessWidget {
                           value2label: 'Right Eye',
                         );
                       } else if (state is DetectorErrorState) {
-                        return Text(state.message);
+                        return Center(child: ErrorComponent(errorMessage: state.message));
                       } else {
                         return const Text('Processing...');
                       }

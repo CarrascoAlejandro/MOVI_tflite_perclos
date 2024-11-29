@@ -9,10 +9,10 @@ import 'package:flutter_camera_test_run/bloc/image/image_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/image/image_event.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 
-
 class DetectorBloc extends Bloc<DetectorEvent, DetectorState> {
   InputImage? _inputImage;
   FaceDetector? _faceDetector;
+  int _alarmCount = 0;
 
   DetectorBloc() : super(DetectorInitialState()) {
     on<InitializeModelEvent>(_onInitializeModel);
@@ -32,6 +32,8 @@ class DetectorBloc extends Bloc<DetectorEvent, DetectorState> {
     );
 
     _faceDetector = GoogleMlKit.vision.faceDetector(options);
+
+    _alarmCount = 0;
   }
 
   Future<void> _onRunModel(
@@ -41,14 +43,14 @@ class DetectorBloc extends Bloc<DetectorEvent, DetectorState> {
 
       // Convert the camera image to a format that the interpreter can understand
       _inputImage = InputImage.fromBytes(
-        bytes: cameraImage.planes[0].bytes,
-        metadata: InputImageMetadata(
-          size: Size(cameraImage.width.toDouble(), cameraImage.height.toDouble()),
-          rotation: InputImageRotation.rotation0deg,
-          format: InputImageFormat.nv21,
-          bytesPerRow: cameraImage.planes[0].bytesPerRow,
-          )
-      );
+          bytes: cameraImage.planes[0].bytes,
+          metadata: InputImageMetadata(
+            size: Size(
+                cameraImage.width.toDouble(), cameraImage.height.toDouble()),
+            rotation: InputImageRotation.rotation0deg,
+            format: InputImageFormat.nv21,
+            bytesPerRow: cameraImage.planes[0].bytesPerRow,
+          ));
 
       // Run the model
       List<Face> faces = await _faceDetector!.processImage(_inputImage!);
@@ -65,7 +67,7 @@ class DetectorBloc extends Bloc<DetectorEvent, DetectorState> {
 
   Future<void> _onPickImageEvent(
       PickImageDetectEvent event, Emitter<DetectorState> emit) async {
-    try{
+    try {
       _inputImage = InputImage.fromFile(event.image);
 
       print("ALECAR: Running model on image ${event.image.path}");
@@ -76,16 +78,29 @@ class DetectorBloc extends Bloc<DetectorEvent, DetectorState> {
       print("ALECAR: Found ${faces.length} faces");
 
       // Add a ProcessedImageEvent to the ImageBloc
-      BlocProvider.of<ImageBloc>(event.context).add(ImageProcessedEvent(event.context, event.image));
+      BlocProvider.of<ImageBloc>(event.context)
+          .add(ImageProcessedEvent(event.context, event.image));
 
       // Emit the results
       if (faces.isEmpty) {
         print("ALECAR: No faces found");
         emit(DetectorErrorState("No faces found"));
       } else {
-        
-        print("ALECAR: Found face: ${faces.first.leftEyeOpenProbability}");
-        emit(DetectorResultState(faces.first));
+        // Emit the results
+        if (!faces.isEmpty) {
+          print("ALECAR: Current alarm count: $_alarmCount");
+          if ((faces.first.leftEyeOpenProbability! +
+                  faces.first.rightEyeOpenProbability!) <
+              0.6) {
+            _alarmCount++;
+            if (_alarmCount > 10) {
+              emit(DetectorErrorState("Drowsiness detected"));
+            }
+          } else {
+            _alarmCount--;
+            emit(DetectorResultState(faces.first));
+          }
+        }
       }
     } catch (e) {
       print("ALECAR: Error running model: $e");

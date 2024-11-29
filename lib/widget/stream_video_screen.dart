@@ -9,6 +9,7 @@ import 'package:flutter_camera_test_run/bloc/camera/camera_state.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_event.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_state.dart';
+import 'package:flutter_camera_test_run/widget/error_component.dart';
 import 'package:flutter_camera_test_run/widget/results_component.dart';
 
 class StreamVideoScreen extends StatelessWidget {
@@ -76,7 +77,7 @@ class StreamVideoScreen extends StatelessWidget {
                             value2label: 'Right Eye',
                           ));
                     } else if (state is DetectorErrorState) {
-                      detectorWidget = Center(child: Text(state.message));
+                      detectorWidget = Center(child: ErrorComponent(errorMessage: state.message));
                     } else {
                       detectorWidget =
                           const Center(child: Text('Streaming, Looking for faces...'));
