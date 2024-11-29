@@ -8,6 +8,8 @@ import 'package:flutter_camera_test_run/bloc/detector/detector_state.dart';
 import 'package:flutter_camera_test_run/bloc/image/image_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/image/image_event.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:vibration/vibration.dart';
 
 class DetectorBloc extends Bloc<DetectorEvent, DetectorState> {
   InputImage? _inputImage;
@@ -89,17 +91,23 @@ class DetectorBloc extends Bloc<DetectorEvent, DetectorState> {
         // Emit the results
         if (!faces.isEmpty) {
           print("ALECAR: Current alarm count: $_alarmCount");
-          if ((faces.first.leftEyeOpenProbability! +
+          if (faces.first.leftEyeOpenProbability == null ||
+              faces.first.rightEyeOpenProbability == null) {
+            emit(DetectorErrorState("No eye probabilities found"));
+          } else if ((faces.first.leftEyeOpenProbability! +
                   faces.first.rightEyeOpenProbability!) <
               0.6) {
             _alarmCount++;
             if (_alarmCount > 10) {
+              //playSound();
+              vibratePhone();
               emit(DetectorErrorState("Drowsiness detected"));
+              return;
             }
           } else {
             _alarmCount--;
-            emit(DetectorResultState(faces.first));
           }
+          emit(DetectorResultState(faces.first));
         }
       }
     } catch (e) {
@@ -111,5 +119,16 @@ class DetectorBloc extends Bloc<DetectorEvent, DetectorState> {
   @override
   Future<void> close() {
     return super.close();
+  }
+
+  /* void playSound() async {
+    final player = AudioPlayer();
+    await player.play(AssetSource('assets/ringing-ringtone-40821.mp3'));
+  } */
+
+  void vibratePhone() async {
+    if ((await Vibration.hasVibrator()) ?? false) {
+      Vibration.vibrate(duration: 1000); // Vibrate for 1 second
+    }
   }
 }

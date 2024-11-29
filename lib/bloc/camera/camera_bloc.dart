@@ -65,7 +65,7 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     print("ALECAR: Image format: ${_controller!.imageFormatGroup}");
 
     try {
-      final context = event.context;
+      final detectorBloc = BlocProvider.of<DetectorBloc>(event.context);
       bool isCapturing = false;
       await _controller!.startImageStream((CameraImage image) async {
         // This function is called every time a new frame is available
@@ -73,7 +73,7 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
         isCapturing = true;
         try {
           var image = await _controller!.takePicture();
-          BlocProvider.of<DetectorBloc>(context).add(PickImageDetectEvent(context, File(image.path)));
+          detectorBloc.add(PickImageDetectEvent(event.context, File(image.path)));
         } catch (e) {
           print("ALECAR: Error capturing image: $e");
         } finally {

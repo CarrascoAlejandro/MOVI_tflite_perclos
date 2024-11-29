@@ -21,10 +21,10 @@ class ResultsComponent extends StatelessWidget {
           style: TextStyle(fontSize: 20, color: Colors.white),
         ),
       );
-    } else if (value1! < 0.2 && value2! < 0.2) {
+    } else if (value1! < 0.2 && value2! < 0.4) {
       backgroundColor = const Color.fromARGB(158, 183, 28, 28);
       content = _buildValuesContent();
-    } else if (value1! < 0.2 || value2! < 0.2) {
+    } else if (value1! < 0.2 || value2! < 0.4) {
       backgroundColor = const Color.fromARGB(167, 245, 127, 23);
       content = _buildValuesContent();
     } else {

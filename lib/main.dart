@@ -29,6 +29,7 @@ Future<void> main() async {
       BlocProvider(create: (context) => ImageBloc()),
     ],
     child: MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       home: MyHomePage(camera: firstCamera),
     ),
