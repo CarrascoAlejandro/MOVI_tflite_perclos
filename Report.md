@@ -8,6 +8,38 @@ _Materia: SIS-204 Programación de Dispositivos Móviles_
 
 El presente informe técnico tiene como objetivo presentar el desarrollo de una aplicación móvil que previene el sueño en conductores, implementando Google ML Kit en tiempo real. La aplicación fue desarrollada en Flutter, un framework de código abierto creado por Google que permite el desarrollo de aplicaciones móviles para Android y iOS.
 
+## Fundamento Teórico
+
+### ¿Qué es PERCLOS?
+
+PERCLOS significa "Porcentaje de Cierre de Ojos". Es una métrica que mide la proporción de tiempo en que los ojos de un conductor están cerrados más allá de un cierto umbral (generalmente 80%) durante un período de tiempo específico. Esta métrica se utiliza principalmente para evaluar el nivel de somnolencia y fatiga del conductor.
+
+### ¿Cómo se utiliza PERCLOS en la detección de somnolencia al conducir?
+
+1. **Sistemas de seguimiento ocular:**
+   - Se utilizan cámaras o sensores especializados para rastrear los movimientos de los ojos del conductor.
+   - Estos sistemas analizan la transmisión de video o los datos de los sensores para detectar casos en los que los ojos están cerrados durante períodos prolongados.
+
+2. **Modelos de Aprendizaje Automático (ML):**
+   - Los modelos de ML se entrenan con grandes conjuntos de datos de imágenes y videos de ojos de conductores tanto alertas como somnolientos.
+   - Estos modelos aprenden a reconocer patrones asociados con la somnolencia, como el cierre lento de párpados o microsueños.
+   - Al analizar en tiempo real los patrones de cierre de ojos del conductor, el modelo de ML puede estimar los valores de PERCLOS.
+
+### ¿Cómo ayuda PERCLOS a prevenir accidentes?
+
+- **Detección temprana:** PERCLOS permite detectar la somnolencia en etapas tempranas, antes de que alcance un nivel peligroso.
+- **Alertas en tiempo real:** Cuando el valor de PERCLOS supera un umbral predefinido, el sistema puede activar alertas para advertir al conductor.
+- **Asistencia al conductor:** Los sistemas avanzados pueden incluso tomar medidas proactivas, como ajustar la temperatura de la cabina o reproducir sonidos estimulantes, para mejorar el estado de alerta.
+- **Información basada en datos:** Al analizar los datos de PERCLOS, los investigadores e ingenieros pueden obtener valiosas ideas sobre los patrones de fatiga de los conductores, lo que conduce a mejoras en el diseño de vehículos y en las características de seguridad.
+
+### Google ML Kit para detección de Rostros
+
+Google publicó un kit de desarrollo de aprendizaje automático llamado ML Kit, que contiene entre sus modelos preentrenados un detector de rostros. Este detector puede identificar puntos de referencia en el rostro, como los ojos, la nariz y la boca, lo que lo hace ideal para la detección de somnolencia en conductores.
+
+![face_landmarks_example](image.png)
+
+El PERCLOS en este caso se calcula a partir de la distancia entre los puntos de referencia de los ojos. 
+
 ## Desarrollo
 
 ### Arquitectura de la aplicación
@@ -310,3 +342,8 @@ _faceDetector = GoogleMlKit.vision.faceDetector(options);
 
 La aplicación desarrollada permite prevenir el sueño en conductores mediante la detección de rostros en tiempo real. La implementación de Google ML Kit en Flutter permite detectar rostros y determinar si una persona está dormida o no. La orquestación de eventos entre los BLoCs permite gestionar los estados de la cámara, el detector de rostros y la imagen de manera eficiente. El subproceso de determinación de sueño con PERCLOS permite calcular el estadístico en tiempo real y tomar acciones en consecuencia.
 
+## Recomendaciones
+
+Se podría mejorar el modelo si se opta por realizar un reinforcement learning. Esto permitiría que el modelo se adapte a las condiciones específicas de nuestro contexto. La desventaja es que se pierde la capacidad de usar la librería de Google ML Kit, pero se gana en precisión y adaptabilidad.
+
+Otra alternativa es entrenar un modelo propio con TensorFlow Lite. Esto permitiría tener un modelo más personalizado y específico para nuestro caso de uso. La desventaja es que se requiere un mayor esfuerzo de desarrollo y entrenamiento.
