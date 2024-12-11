@@ -47,7 +47,7 @@ _controller = CameraController(
         );
 ```
 
-- `_onTakePicture`: Siempre que se tenga cargado el controlador, captura una únca imagen y regresa la ruta de la imagen capturada.
+- `_onTakePicture`: Captura una única imagen y regresa la ruta de la imagen capturada.
 
 ```dart
 final image = await _controller!.takePicture(); // Take a picture
@@ -80,11 +80,7 @@ Estos son los estados que maneja:
 
 Estos estados son manejados por el `DetectorBloc` que utiliza 3 eventos para manejar el detector:
 
-- `_onInitializeModel`: Emite un estado `DetectorLoadingState` mientras carga el modelo del detector. Al finalizar emite un estado `DetectorModelLoadedState` con el modelo cargado.
-
-```dart
-
-```
+- `_onInitializeModel`: Emite un estado `DetectorLoadingState` mientras carga el modelo del detector. Al finalizar emite un estado `DetectorModelLoadedState` con el modelo cargado. Los detalles de la configuración del modelo se discuten más abajo.
 
 - `_onRunModel`: Siempre que se tenga cargado el modelo, detecta rostros en una imagen y emite un estado `DetectorResultState` con la información del rostro detectado.
 
@@ -218,9 +214,9 @@ await _controller!.startImageStream((CameraImage image) async {
 });
 ```
 
-Es importante en este punto destacar la asincronicidad de la función que se ejecuta en el stream. Pues si no se ha liberado el recurso de la cámara o el detector puede que se genere un error. Por ello, se utiliza un flag `isCapturing` para evitar que se capturen múltiples imágenes en un mismo frame. Así se mantiene el proceso fluido aún si no se puede correr el detector en todos los fotogramas.
+Es importante destacar la asincronicidad de la función que se ejecuta en el stream. Pues si no se ha liberado el recurso de la cámara o el detector puede que se genere un error. Por ello, se utiliza un flag `isCapturing` para evitar que se capturen múltiples imágenes en un mismo frame. Así se mantiene el proceso fluido aún si no se puede correr el detector en todos los fotogramas.
 
-6. **Procesamiento de resultados en el Detector**: El detecto trabaja en base a la librería de Google ML Kit. Una vez que se detecta un rostro, evalúa si el rostro está dormido o no. Si el rostro está dormido, se emite un estado `DetectorErrorState` con un mensaje de advertencia. Caso contrario regresa un estado `DetectorResultState` con la información del rostro detectado.
+6. **Procesamiento de resultados en el Detector**: El detector trabaja en base a la librería de Google ML Kit. Una vez que se detecta un rostro, evalúa si el rostro está dormido o no. Si el rostro está dormido, se emite un estado `DetectorErrorState` con un mensaje de advertencia. Caso contrario regresa un estado `DetectorResultState` con la información del rostro detectado.
 
 ```dart
 _inputImage = InputImage.fromFile(event.image);
