@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/camera/camera_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_bloc.dart';
@@ -22,18 +24,21 @@ Future<void> main() async {
   // Get a specific camera from the list of available cameras.
   final firstCamera = cameras[1];
 
-  runApp(MultiBlocProvider(
-    providers: [
-      BlocProvider(create: (context) => CameraBloc()),
-      BlocProvider(create: (context) => DetectorBloc()),
-      BlocProvider(create: (context) => ImageBloc()),
-    ],
-    child: MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
-      home: MyHomePage(camera: firstCamera),
-    ),
-  ));
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => CameraBloc()),
+        BlocProvider(create: (context) => DetectorBloc()),
+        BlocProvider(create: (context) => ImageBloc()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.dark(),
+        home: MyHomePage(camera: firstCamera),
+      ),
+    ));
+  });
 }
 
 class MyHomePage extends StatelessWidget {
@@ -121,6 +126,13 @@ class MyHomePage extends StatelessWidget {
           children: [
             const AboutPERCLOS(),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.teal,
+                textStyle: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -129,9 +141,9 @@ class MyHomePage extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text('Try it Out!'),
+              child: const Text('Try it Out!', style: TextStyle(fontSize: 20)),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
           ],
         ))),
       ),

@@ -40,16 +40,24 @@ class CameraShotScreen extends StatelessWidget {
                     height: MediaQuery.of(context).size.height * 0.60,
                     child: CameraPreview(state.controller),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.teal,
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     onPressed: () async {
                       final image = await state.controller.takePicture();
                       context
                           .read<DetectorBloc>()
                           .add(PickImageDetectEvent(context, File(image.path)));
                     },
-                    child: const Text('Take Picture'),
+                    child: const Text('Take Picture', style: TextStyle(fontSize: 20)),
                   ),
+                  const SizedBox(height: 12),
                   BlocBuilder<DetectorBloc, DetectorState>(
                     builder: (context, state) {
                       if (state is DetectorResultState) {
@@ -60,7 +68,8 @@ class CameraShotScreen extends StatelessWidget {
                           value2label: 'Right Eye',
                         );
                       } else if (state is DetectorErrorState) {
-                        return Center(child: ErrorComponent(errorMessage: state.message));
+                        return Center(
+                            child: ErrorComponent(errorMessage: state.message));
                       } else {
                         return const Text('Processing...');
                       }

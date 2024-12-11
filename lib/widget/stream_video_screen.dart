@@ -21,9 +21,17 @@ class StreamVideoScreen extends StatelessWidget {
     context.read<CameraBloc>().add(InitializeCameraEvent(camera));
     context.read<DetectorBloc>().add(InitializeModelEvent());
 
-    return Scaffold(
+    return BlocProvider(
+      create: (context) => CameraBloc()..add(InitializeCameraEvent(camera)),
+      child: Scaffold(
       appBar: AppBar(title: const Text('Stream Video')),
-      body: BlocBuilder<CameraBloc, CameraState>(
+      body: BlocListener<CameraBloc, CameraState>(
+          listener: (context, state) {
+            if (state is CameraErrorState) {
+              print("ALECAR: Camera Error: ${state.message}");
+            }
+          },
+          child: BlocBuilder<CameraBloc, CameraState>(
         builder: (context, state) {
           if (state is CameraLoadingState) {
             return const Center(child: CircularProgressIndicator());
@@ -95,14 +103,14 @@ class StreamVideoScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
         },
-      ),
+      )),
       /* floatingActionButton: FloatingActionButton(
           onPressed: () {
             context.read<CameraBloc>().add(TakePicture());
           },
           child: const Icon(Icons.camera_alt),
         ), */
-    );
+    ));
   }
 }
 

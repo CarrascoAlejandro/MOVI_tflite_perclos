@@ -98,8 +98,8 @@ class DetectorBloc extends Bloc<DetectorEvent, DetectorState> {
                   faces.first.rightEyeOpenProbability!) <
               0.6) {
             _alarmCount++;
-            if (_alarmCount > 10) {
-              //playSound();
+            if (_alarmCount > 5) {
+              playSound();
               vibratePhone();
               emit(DetectorErrorState("Drowsiness detected"));
               return;
@@ -121,10 +121,10 @@ class DetectorBloc extends Bloc<DetectorEvent, DetectorState> {
     return super.close();
   }
 
-  /* void playSound() async {
+  void playSound() async {
     final player = AudioPlayer();
-    await player.play(AssetSource('assets/ringing-ringtone-40821.mp3'));
-  } */
+    await player.play(AssetSource('ringing-ringtone-40821.mp3'));
+  }
 
   void vibratePhone() async {
     if ((await Vibration.hasVibrator()) ?? false) {

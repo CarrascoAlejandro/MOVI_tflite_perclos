@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_bloc.dart';
 import 'package:flutter_camera_test_run/bloc/detector/detector_event.dart';
@@ -32,7 +33,8 @@ class PickImageScreen extends StatelessWidget {
             } else if (state is ImageErrorState) {
               return Text(state.error);
             } else if (state is ImageProcessedState) {
-              return buildImageResult(context, state.image, state.width, state.height);
+              return buildImageResult(
+                  context, state.image, state.width, state.height);
             } else {
               return Container();
             }
@@ -40,17 +42,19 @@ class PickImageScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: BlocBuilder<ImageBloc, ImageState>(
-          builder: (context, state) {
-            if (state is! ImageInitialState) {
-              return FloatingActionButton(
-                onPressed: () {
-                  BlocProvider.of<ImageBloc>(context).add(ResetImageEvent());
-                },
-                child: Icon(Icons.refresh),
-              );
-            } else {
-              return Container();
-            }
+        builder: (context, state) {
+          if (state is! ImageInitialState) {
+            return FloatingActionButton(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.teal,
+              onPressed: () {
+                BlocProvider.of<ImageBloc>(context).add(ResetImageEvent());
+              },
+              child: Icon(Icons.refresh),
+            );
+          } else {
+            return Container();
+          }
         },
       ),
     );
@@ -64,10 +68,17 @@ class PickImageScreen extends StatelessWidget {
         HowItWorks(),
         SizedBox(height: 20),
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.teal,
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           onPressed: () {
             BlocProvider.of<ImageBloc>(context).add(PickImageEvent(context));
           },
-          child: Text('Pick Image'),
+          child: Text('Pick Image', style: TextStyle(fontSize: 20)),
         ),
       ],
     );
@@ -84,13 +95,13 @@ class PickImageScreen extends StatelessWidget {
     );
   }
 
-  Widget buildImageResult(BuildContext context, File image, int width, int height) {
+  Widget buildImageResult(
+      BuildContext context, File image, int width, int height) {
     //final double width_relative = width / 100;
-    final Image imageWidget = Image.file(
-      image
-    );
+    final Image imageWidget = Image.file(image);
 
-    return Column(
+    return SingleChildScrollView(
+        child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         BlocBuilder<DetectorBloc, DetectorState>(
@@ -110,7 +121,7 @@ class PickImageScreen extends StatelessWidget {
               );
             } else {
               return imageWidget;
-            }  
+            }
           },
         ),
         SizedBox(height: 20),
@@ -125,7 +136,8 @@ class PickImageScreen extends StatelessWidget {
                 value2label: 'Right Eye',
               );
             } else if (state is DetectorErrorState) {
-              detectorWidget = Center(child: ErrorComponent(errorMessage: state.message));
+              detectorWidget =
+                  Center(child: ErrorComponent(errorMessage: state.message));
             } else {
               detectorWidget = Text('Processing...');
             }
@@ -134,6 +146,6 @@ class PickImageScreen extends StatelessWidget {
           },
         ),
       ],
-    );
+    ));
   }
 }
